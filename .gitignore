@@ -8,6 +8,10 @@
 
 Assets/AssetStoreTools*
 
+# DOTween
+[Aa]ssets/Demigiant/
+[Aa]ssets/[Rr]esources/DoTween*
+
 # Visual Studio cache directory
 .vs/
 
