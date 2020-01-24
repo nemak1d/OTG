@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Audio;
-using N1D.Core;
+using N1D.Framework.Core;
 
-namespace N1D.Sound
+namespace N1D.Framework.Sound
 {
 	public class AudioHandler
 	{
@@ -133,4 +131,4 @@ namespace N1D.Sound
 		[SerializeField]
 		private AudioMixerGroup m_SeMixerGroup = null;
 	}
-} // N1D.Sound
+} // N1D.Framework.Sound

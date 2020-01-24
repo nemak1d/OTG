@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-
-namespace N1D.Core
+namespace N1D.Framework.Core
 {
 	public class StateMachine<T>
 	{
@@ -61,4 +58,4 @@ namespace N1D.Core
 		Dictionary<T, State> m_States = new Dictionary<T, State>();
 
 	}
-} // N1D.Core
+} // N1D.Framework.Core

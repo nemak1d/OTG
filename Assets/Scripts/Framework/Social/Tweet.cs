@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 
-namespace N1D.Social
+namespace N1D.Framework.Social
 {
 	public class Tweet : MonoBehaviour
 	{
@@ -105,4 +105,4 @@ namespace N1D.Social
 		string m_UploadedURL = string.Empty;
 		UploadProgress m_Progress = UploadProgress.Failed;
 	}
-} // N1D.Social
+} // N1D.Framework.Social

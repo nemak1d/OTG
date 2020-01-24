@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace N1D.UI
+namespace N1D.Framework.UI
 {
 
 	public class UITweenSequence : MonoBehaviour
@@ -58,4 +58,4 @@ namespace N1D.UI
 		[SerializeField]
 		bool m_Loop = false;
 	}
-} // N1D.UI
+} // N1D.Framework.UI

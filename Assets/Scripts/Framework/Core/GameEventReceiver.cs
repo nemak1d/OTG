@@ -1,10 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine.EventSystems;
 
-
-namespace N1D.Core
+namespace N1D.Framework.Core
 {
 	public enum GameEventId
 	{
@@ -33,4 +29,4 @@ namespace N1D.Core
 	{
 		void OnReceiveGameEvent(GameEventId id);
 	}
-} // N1D.Core
+} // N1D.Framework.Core

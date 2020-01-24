@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace N1D.Core
+namespace N1D.Framework.Core
 {
 	public class GameEventManager : Singleton<GameEventManager>
 	{
@@ -40,4 +39,4 @@ namespace N1D.Core
 
 		List<GameObject> m_Handlers = new List<GameObject>();
 	}
-} // N1D.Core
+} // N1D.Framework.Core

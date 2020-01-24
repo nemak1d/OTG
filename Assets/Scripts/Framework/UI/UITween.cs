@@ -6,7 +6,7 @@ using UnityEngine;
 using DG.Tweening;
 
 
-namespace N1D.UI
+namespace N1D.Framework.UI
 {
 
 	public delegate void OnCompleteDelegate();
@@ -264,4 +264,4 @@ namespace N1D.UI
 
 		private DG.Tweening.Sequence m_Sequence = null;
 	}
-} // N1D.UI
+} // N1D.Framework.UI

@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using N1D.Core;
+using N1D.Framework.Core;
 
-namespace N1D.Dbg
+namespace N1D.Framework.Dbg
 {
 	[DefaultExecutionOrder(-1)]
 	public class Draw : Singleton<Draw>
@@ -79,4 +79,4 @@ namespace N1D.Dbg
 		}
 		private Queue<Input> m_Queue = new Queue<Input>(100);
 	}
-} // N1D.Dbg
+} // N1D.Framework.Dbg

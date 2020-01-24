@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-
-namespace N1D.Core
+namespace N1D.Framework.Core
 {
 	public class Timer
 	{
@@ -52,4 +49,4 @@ namespace N1D.Core
 		bool m_IsTimeOutNow = false;
 
 	}
-} // N1D.Core
+} // N1D.Framework.Core

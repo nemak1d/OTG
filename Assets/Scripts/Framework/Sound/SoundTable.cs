@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using N1D.Core;
+using N1D.Framework.Core;
 
-namespace N1D.Sound
+namespace N1D.Framework.Sound
 {
 	public class SoundTable : Singleton<SoundTable>
 	{
@@ -64,4 +63,4 @@ namespace N1D.Sound
 		[SerializeField]
 		public AudioClip[] m_SeTable = null;
 	}
-} // N1D.Sound
+} // N1D.Framework.Sound
