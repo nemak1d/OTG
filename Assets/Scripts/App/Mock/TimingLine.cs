@@ -5,12 +5,16 @@ using N1D.Framework.Dbg;
 
 namespace N1D.App
 {
-	public class TimingLine : MonoBehaviour
+	// ターゲットラインを指定時間に合わせて通過する
+	// 合わせて通過するには→何秒前から表示するか
+	// 
+	public class TimingLine : MonoBehaviour, IGameEventReceivable
 	{
 		// Start is called before the first frame update
 		void Start()
 		{
-			m_StartTime = Time.realtimeSinceStartup;
+			GameEventManager.instance.Add(gameObject);
+			Metronome.instance.Initialize(m_Bpm);
 
 			for (var i = 0; i < 100; ++i)
 			{
@@ -28,6 +32,7 @@ namespace N1D.App
 
 			DrawLine(m_TimingPoint + (m_ToFromDirection * m_Length), Vector3.right, m_LineWidth, Color.yellow);
 			DrawLine(m_TimingPoint, Vector3.right, m_LineWidth, Color.red);
+			DrawLine(m_TimingPoint + (m_ToFromDirection * -m_BackLength), Vector3.right, m_LineWidth, Color.yellow);
 
 			UpdateLine();
 		}
@@ -42,8 +47,10 @@ namespace N1D.App
 			var point = Vector3.Lerp(m_TimingPoint + (m_ToFromDirection * m_Length), m_TimingPoint, t);
 			DrawLine(point, Vector3.right, m_LineWidth, Color.green);
 #else
+			/*
 			var delta = (Time.realtimeSinceStartup - m_StartTime);
 			var count = (int)(delta / m_Interval);
+			
 			if (count > m_ProceededCount)
 			{
 				foreach (var guide in m_Guides)
@@ -54,12 +61,13 @@ namespace N1D.App
 					}
 					Debug.Log("start->" + delta);
 					guide.Start(m_Interval * ++m_ProceededCount + m_StartTime);
-					if (count <= ++m_ProceededCount)
+					if (count <= m_ProceededCount)
 					{
 						break;
 					}
 				}
 			}
+			*/
 
 			var i = 0;
 			foreach (var guide in m_Guides)
@@ -101,10 +109,40 @@ namespace N1D.App
 			return length / speed;
 		}
 
+		public void OnReceiveGameEvent(GameEventVariant eventVariant)
+		{
+			switch (eventVariant.id)
+			{
+				case GameEventId.Beat:
+				{
+					OnBeat(eventVariant);
+					break;
+				}
+			}
+		}
+
+		private void OnBeat(GameEventVariant eventVariant)
+		{
+			var isStarted = false;
+			foreach (var guide in m_Guides)
+			{
+				if (guide.isActive)
+				{
+					continue;
+				}
+				guide.Start(Metronome.instance.CalculateBeatTime(eventVariant.intValue));
+				isStarted = true;
+				break;
+			}
+
+			Debug.Assert(isStarted, "非アクティブなガイドが見つからなかった");
+		}
+
 		// positions
 		public Vector3 m_TimingPoint = Vector3.zero;
 		public Vector3 m_ToFromDirection = Vector3.up;
 		public float m_Length = 5.0f;
+		public float m_BackLength = 3.0f;
 
 		// parameter
 		public float m_Speed = 1.0f;
@@ -112,8 +150,6 @@ namespace N1D.App
 		// visual
 		public float m_LengthMoveTime = 1.0f;
 		public float m_LineWidth = 3.0f;
-
-		public float m_StartTime = 0.0f;
 
 		[SerializeField, Range(0.001f, 9999.0f)]
 		private float m_Bpm = 120.0f;
@@ -130,7 +166,6 @@ namespace N1D.App
 		private int m_Count = 0;
 		private int m_ProceededCount = 0;
 
-		// スポーン間隔は決まってるので、後は何秒でタイミングになるか…
 		List<Guide> m_Guides = new List<Guide>();
 
 		private class Guide
