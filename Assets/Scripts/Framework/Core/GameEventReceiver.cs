@@ -1,4 +1,5 @@
-﻿using UnityEngine.EventSystems;
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace N1D.Framework.Core
 {
@@ -22,11 +23,22 @@ namespace N1D.Framework.Core
 		RequestRetry,
 		Capture,
 		Tweet,
+
+		Beat,
+	}
+
+	public struct GameEventVariant
+	{
+		public GameEventId id;
+		public int intValue;
+		public float floatValue;
+		public bool boolValue;
+		public Vector3 vector3Value;
 	}
 
 
 	public interface IGameEventReceivable : IEventSystemHandler
 	{
-		void OnReceiveGameEvent(GameEventId id);
+		void OnReceiveGameEvent(GameEventVariant id);
 	}
 } // N1D.Framework.Core
