@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using N1D.Framework.Core;
+﻿using N1D.Framework.Core;
 using N1D.Framework.Dbg;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace N1D.App
 {
@@ -18,8 +18,8 @@ namespace N1D.App
 
 			for (var i = 0; i < 100; ++i)
 			{
-				var guide = new Guide();
-				guide.id = i;
+				var guide = new Beat();
+				//guide.id = i;
 				m_Guides.Add(guide);
 			}
 		}
@@ -39,51 +39,19 @@ namespace N1D.App
 
 		private void UpdateLine()
 		{
-#if false
-			var delta = Time.realtimeSinceStartup - m_StartTime;
-			m_Delta = delta;
-			var t = delta % m_DestinationTime / m_DestinationTime;
-			m_Rate = t;
-			var point = Vector3.Lerp(m_TimingPoint + (m_ToFromDirection * m_Length), m_TimingPoint, t);
-			DrawLine(point, Vector3.right, m_LineWidth, Color.green);
-#else
-			/*
-			var delta = (Time.realtimeSinceStartup - m_StartTime);
-			var count = (int)(delta / m_Interval);
-			
-			if (count > m_ProceededCount)
-			{
-				foreach (var guide in m_Guides)
-				{
-					if (guide.isActive)
-					{
-						continue;
-					}
-					Debug.Log("start->" + delta);
-					guide.Start(m_Interval * ++m_ProceededCount + m_StartTime);
-					if (count <= m_ProceededCount)
-					{
-						break;
-					}
-				}
-			}
-			*/
-
 			var i = 0;
 			foreach (var guide in m_Guides)
 			{
 				++i;
-				if (!guide.isActive)
+				if (!guide.IsActive)
 				{
 					continue;
 				}
 				guide.Update(m_DestinationTime);
-				var point = Vector3.Lerp(m_TimingPoint + (m_ToFromDirection * m_Length), m_TimingPoint, guide.t);
-				DrawLine(point, Vector3.right, m_LineWidth, new Color(0.0f, 0.1f * guide.id % 1.0f, 0.0f));
-				Debug.Log(i + "->" + guide.t);
+				var point = Vector3.Lerp(m_TimingPoint + (m_ToFromDirection * m_Length), m_TimingPoint, guide.Progress);
+				DrawLine(point, Vector3.right, m_LineWidth, Color.green);
+				Debug.Log(i + "->" + guide.Progress);
 			}
-
-#endif
 		}
 
 		private void DrawLine(Vector3 point, Vector3 direction, float length, Color color)
@@ -126,7 +94,7 @@ namespace N1D.App
 			var isStarted = false;
 			foreach (var guide in m_Guides)
 			{
-				if (guide.isActive)
+				if (guide.IsActive)
 				{
 					continue;
 				}
@@ -166,36 +134,6 @@ namespace N1D.App
 		private int m_Count = 0;
 		private int m_ProceededCount = 0;
 
-		List<Guide> m_Guides = new List<Guide>();
-
-		private class Guide
-		{
-			public void Start(float startTime)
-			{
-				m_StartTime = startTime;
-				isActive = true;
-			}
-
-			public void Update(float destinationTime)
-			{
-				if (!isActive)
-				{
-					return;
-				}
-
-				var delta = Time.realtimeSinceStartup - m_StartTime;
-				t = delta % destinationTime / destinationTime;
-
-				if (delta >= destinationTime)
-				{
-					isActive = false;
-				}
-			}
-			public int id { set; get; }
-			public float t { private set; get; } = 0.0f;
-			public bool isActive { private set; get; } = false;
-
-			private float m_StartTime = 0.0f;
-		}
+		List<Beat> m_Guides = new List<Beat>();
 	}
 }
