@@ -77,7 +77,7 @@ namespace N1D.App
 		public int Count { private set; get; } = 0;
 		public float Bpm
 		{
-			private set { m_Bpm = value; }
+			set { m_Bpm = value; }
 			get { return m_Bpm; }
 		}
 
