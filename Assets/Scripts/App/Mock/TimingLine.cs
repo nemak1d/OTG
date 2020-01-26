@@ -57,12 +57,12 @@ namespace N1D.App
 
 			Draw.instance.Line(from, to, color);
 		}
-		private float CalculateDestinationTime(float arriveTimeAtTimingLine, float speed)
+		private int CalculateDestinationTime(int arriveTimeAtTimingLine, float speed)
 		{
 			Debug.Assert(!speed.IsZero());
 
 			var time = arriveTimeAtTimingLine / (m_Length * m_TimingLineRate);
-			return time * m_Length / speed;
+			return (int)((float)(time * m_Length) / speed);
 		}
 
 		public void OnReceiveGameEvent(GameEventVariant eventVariant)
@@ -102,7 +102,7 @@ namespace N1D.App
 
 		// parameter
 		public float m_Speed = 1.0f;
-		public float m_TimingTime = 5.0f;
+		public int m_TimingTime = 5000;
 
 		// visual
 		public float m_LineWidth = 3.0f;
@@ -111,7 +111,7 @@ namespace N1D.App
 		private float m_Bpm = 120.0f;
 
 		[SerializeField, Uneditable]
-		private float m_DestinationTime = 0.0f;
+		private int m_DestinationTime = 0;
 
 		List<Beat> m_Guides = new List<Beat>();
 	}

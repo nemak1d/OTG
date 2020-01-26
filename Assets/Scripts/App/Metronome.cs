@@ -30,16 +30,16 @@ namespace N1D.App
 		public void Initialize(float bpm)
 		{
 			Bpm = bpm;
-			StartTime = Time.realtimeSinceStartup;
+			StartTime = TimeManager.instance.RealTimeMs;
 			Count = 0;
 		}
-		public float CalculateInterval()
+		public int CalculateInterval()
 		{
 			Debug.Assert(!Bpm.IsZero());
 
-			return 60.0f / Bpm;
+			return (int)(60000.0f / Bpm);
 		}
-		public float CalculateBeatTime(int count)
+		public int CalculateBeatTime(int count)
 		{
 			return CalculateInterval() * count + StartTime;
 		}
@@ -51,8 +51,8 @@ namespace N1D.App
 		private void UpdateInterval()
 		{
 			var interval = CalculateInterval();
-			var deltaTime = (Time.realtimeSinceStartup - StartTime);
-			var count = (int)(deltaTime / interval);
+			var deltaTime = (TimeManager.instance.RealTimeMs - StartTime);
+			var count = deltaTime / interval;
 			if (count > Count)
 			{
 				var deltaCount = count - Count;
@@ -73,7 +73,7 @@ namespace N1D.App
 		//-----------------------------------
 		// Property
 		//-----------------------------------
-		public float StartTime { private set; get; } = 0.0f;
+		public int StartTime { private set; get; } = 0;
 		public int Count { private set; get; } = 0;
 		public float Bpm
 		{

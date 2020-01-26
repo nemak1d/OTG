@@ -12,21 +12,21 @@ namespace N1D.App
 		//-----------------------------------
 		// Method (public)
 		//-----------------------------------
-		public void Start(float startTime)
+		public void Start(int startTime)
 		{
 			m_StartTime = startTime;
 			Progress = 0.0f;
 			IsActive = true;
 		}
-		public void Update(float destinationTime)
+		public void Update(int destinationTime)
 		{
 			if (!IsActive)
 			{
 				return;
 			}
 
-			var delta = Time.realtimeSinceStartup - m_StartTime;
-			Progress = delta % destinationTime / destinationTime;
+			var delta = TimeManager.instance.RealTimeMs - m_StartTime;
+			Progress = (float)delta % (float)destinationTime / (float)destinationTime;
 
 			if (delta >= destinationTime)
 			{
@@ -52,7 +52,7 @@ namespace N1D.App
 		//-----------------------------------
 		// Field
 		//-----------------------------------
-		private float m_StartTime = 0.0f;
+		private int m_StartTime = 0;
 
 		//-----------------------------------
 		// Internal Class / Struct
