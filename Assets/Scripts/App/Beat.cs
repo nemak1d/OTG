@@ -25,7 +25,7 @@ namespace N1D.App
 				return;
 			}
 
-			var delta = TimeManager.instance.RealTimeMs - m_StartTime;
+			var delta = Metronome.instance.Time - m_StartTime;
 			Progress = (float)delta % (float)destinationTime / (float)destinationTime;
 
 			if (delta >= destinationTime)

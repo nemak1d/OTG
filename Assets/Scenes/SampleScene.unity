@@ -155,14 +155,11 @@ MonoBehaviour:
   m_Length: 16
   m_TimingLineRate: 0.7
   m_Speed: 1
-  m_TimingTime: 5
-  m_LengthMoveTime: 3
+  m_TimingTime: 5000
   m_LineWidth: 3
   m_Bpm: 60
   m_DestinationTime: 0
-  m_Delta: 0
-  m_Rate: 0
-  m_Count: 0
+  timing: 401f0000a41f000008200000
 --- !u!4 &441014565
 Transform:
   m_ObjectHideFlags: 0

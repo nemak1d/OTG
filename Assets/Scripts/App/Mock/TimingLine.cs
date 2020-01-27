@@ -17,6 +17,11 @@ namespace N1D.App
 				var guide = new Beat();
 				m_Guides.Add(guide);
 			}
+			for (var i = 0; i < 100; ++i)
+			{
+				var note = new Beat();
+				m_Notes.Add(note);
+			}
 		}
 
 		void Update()
@@ -25,6 +30,45 @@ namespace N1D.App
 			m_DestinationTime = CalculateDestinationTime(m_TimingTime, m_Speed);
 
 			UpdateLine();
+			UpdateTrackSheet();
+		}
+
+		private void UpdateTrackSheet()
+		{
+			if (timing == null)
+			{
+				return;
+			}
+
+			for (var i = processTimingCount; i < timing.Length; ++i)
+			{
+				var startTime = timing[i] - m_TimingTime;
+				if (startTime <= Metronome.instance.Time)
+				{
+					foreach (var note in m_Notes)
+					{
+						if (note.IsActive)
+						{
+							continue;
+						}
+						note.Start(startTime);
+						++processTimingCount;
+						break;
+					}
+				}
+			}
+			var endPoint = m_Direction * m_Length + m_StartPoint;
+			var timingPoint = Vector3.Lerp(m_StartPoint, endPoint, m_TimingLineRate);
+			foreach (var note in m_Notes)
+			{
+				if (!note.IsActive)
+				{
+					continue;
+				}
+				note.Update(m_DestinationTime);
+				var point = Vector3.Lerp(m_StartPoint, endPoint, note.Progress);
+				DrawCircle(point, m_LineWidth * 0.3f, Color.red);
+			}
 		}
 
 		private void UpdateLine()
@@ -57,6 +101,10 @@ namespace N1D.App
 
 			Draw.instance.Line(from, to, color);
 		}
+		private void DrawCircle(Vector3 point, float radius, Color color)
+		{
+			Draw.instance.Circle(point, radius, color);
+		}
 		private int CalculateDestinationTime(int arriveTimeAtTimingLine, float speed)
 		{
 			Debug.Assert(!speed.IsZero());
@@ -64,7 +112,7 @@ namespace N1D.App
 			var time = arriveTimeAtTimingLine / (m_Length * m_TimingLineRate);
 			return (int)((float)(time * m_Length) / speed);
 		}
-
+		
 		public void OnReceiveGameEvent(GameEventVariant eventVariant)
 		{
 			switch (eventVariant.id)
@@ -114,5 +162,11 @@ namespace N1D.App
 		private int m_DestinationTime = 0;
 
 		List<Beat> m_Guides = new List<Beat>();
+		List<Beat> m_Notes = new List<Beat>();
+
+		[SerializeField]
+		private int[] timing = null;
+		private int processTimingCount = 0;
+
 	}
 }
