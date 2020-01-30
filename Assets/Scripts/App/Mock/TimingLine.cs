@@ -29,8 +29,20 @@ namespace N1D.App
 			Metronome.instance.Bpm = m_Bpm;
 			m_DestinationTime = CalculateDestinationTime(m_TimingTime, m_Speed);
 
+			UpdateInput();
+
 			UpdateLine();
 			UpdateTrackSheet();
+
+			MightJudge();
+		}
+
+		private void UpdateInput()
+		{
+			if (Input.anyKeyDown)
+			{
+				m_IsInput = true;
+			}
 		}
 
 		private void UpdateTrackSheet()
@@ -51,7 +63,7 @@ namespace N1D.App
 						{
 							continue;
 						}
-						note.Start(startTime);
+						note.Start(startTime, timing[i]);
 						++processTimingCount;
 						break;
 					}
@@ -68,6 +80,29 @@ namespace N1D.App
 				note.Update(m_DestinationTime);
 				var point = Vector3.Lerp(m_StartPoint, endPoint, note.Progress);
 				DrawCircle(point, m_LineWidth * 0.3f, Color.red);
+
+				// 前後のラインを測るには内部の式出さないといかんなーとか思っちゃうところ。
+				var earlyPerfect = note.CalculateProgress(Metronome.instance.Time - m_PerfectDelta, m_DestinationTime);
+				var latePerfect = note.CalculateProgress(Metronome.instance.Time + m_PerfectDelta, m_DestinationTime);
+				var earlyGreat = note.CalculateProgress(Metronome.instance.Time - m_GreatDelta, m_DestinationTime);
+				var lateGreat = note.CalculateProgress(Metronome.instance.Time + m_GreatDelta, m_DestinationTime);
+				var earlyGood = note.CalculateProgress(Metronome.instance.Time - m_GoodDelta, m_DestinationTime);
+				var lateGood = note.CalculateProgress(Metronome.instance.Time + m_GoodDelta, m_DestinationTime);
+
+				point = Vector3.Lerp(m_StartPoint, endPoint, earlyPerfect);
+				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.yellow);
+				point = Vector3.Lerp(m_StartPoint, endPoint, latePerfect);
+				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.yellow);
+
+				point = Vector3.Lerp(m_StartPoint, endPoint, earlyGreat);
+				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.cyan);
+				point = Vector3.Lerp(m_StartPoint, endPoint, lateGreat);
+				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.cyan);
+
+				point = Vector3.Lerp(m_StartPoint, endPoint, earlyGood);
+				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.blue);
+				point = Vector3.Lerp(m_StartPoint, endPoint, lateGood);
+				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.blue);
 			}
 		}
 
@@ -91,6 +126,62 @@ namespace N1D.App
 				var point = Vector3.Lerp(m_StartPoint, endPoint, guide.Progress);
 				DrawLine(point, Vector3.right, m_LineWidth, Color.green);
 			}
+		}
+
+		private float CalculateProgress(int startTime, int currentTime)
+		{
+			var delta = currentTime - startTime; ;
+			return Mathf.Clamp01((float)delta % (float)m_DestinationTime / (float)m_DestinationTime);
+		}
+
+		private void MightJudge()
+		{
+			if (m_IsInput)
+			{
+				Beat next = null;
+				foreach (var note in m_Notes)
+				{
+					if (!note.IsActive)
+					{
+						continue;
+					}
+
+					if (next == null)
+					{
+						next = note;
+					}
+					// 最遅判定時間をオーバーせず先頭なら
+					else if (note.TargetTime + m_GoodDelta < Metronome.instance.Time
+						&& note.TargetTime < next.TargetTime)
+					{
+						next = note;
+					}
+				}
+
+				if (next != null)
+				{
+					var time = Metronome.instance.Time;
+					if (Mathf.Abs(next.TargetTime - time) <= m_PerfectDelta)
+					{
+						Debug.Log("Perfect!");
+					}
+					else if (Mathf.Abs(next.TargetTime - time) <= m_GreatDelta)
+					{
+						Debug.Log("Great!");
+					}
+					else if (Mathf.Abs(next.TargetTime - time) <= m_GoodDelta)
+					{
+						Debug.Log("Good!");
+					}
+					else
+					{
+						Debug.Log("Miss...");
+					}
+					next.Stop();
+				}
+			}
+
+			m_IsInput = false;
 		}
 
 		private void DrawLine(Vector3 point, Vector3 direction, float length, Color color)
@@ -134,7 +225,8 @@ namespace N1D.App
 				{
 					continue;
 				}
-				guide.Start(Metronome.instance.CalculateBeatTime(eventVariant.intValue));
+				var time = Metronome.instance.CalculateBeatTime(eventVariant.intValue);
+				guide.Start(time, time);
 				isStarted = true;
 				break;
 			}
@@ -167,6 +259,18 @@ namespace N1D.App
 		[SerializeField]
 		private int[] timing = null;
 		private int processTimingCount = 0;
+
+
+		[SerializeField]
+		private int m_PerfectDelta = 33;
+		[SerializeField]
+		private int m_GreatDelta = 99;
+		[SerializeField]
+		private int m_GoodDelta = 264;
+		[SerializeField]
+
+		private bool m_IsInput = false;
+		
 
 	}
 }

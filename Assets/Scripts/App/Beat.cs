@@ -12,9 +12,10 @@ namespace N1D.App
 		//-----------------------------------
 		// Method (public)
 		//-----------------------------------
-		public void Start(int startTime)
+		public void Start(int startTime, int targetTime)
 		{
 			m_StartTime = startTime;
+			TargetTime = targetTime;
 			Progress = 0.0f;
 			IsActive = true;
 		}
@@ -25,14 +26,29 @@ namespace N1D.App
 				return;
 			}
 
-			var delta = Metronome.instance.Time - m_StartTime;
-			Progress = (float)delta % (float)destinationTime / (float)destinationTime;
+			//var delta = Metronome.instance.Time - m_StartTime;
+			//Progress = (float)delta % (float)destinationTime / (float)destinationTime;
+			Progress = CalculateProgress(Metronome.instance.Time, destinationTime);
 
+			if (Progress >= 1.0f)
+			{
+				Stop();
+			}
+		}
+		public void Stop()
+		{
+			Progress = 1.0f;
+			IsActive = false;
+		}
+
+		public float CalculateProgress(int time, int destinationTime)
+		{
+			var delta = time - m_StartTime;
 			if (delta >= destinationTime)
 			{
-				IsActive = false;
-				Progress = 1.0f;
+				return 1.0f;
 			}
+			return (float)delta % (float)destinationTime / (float)destinationTime;
 		}
 
 		//-----------------------------------
@@ -44,6 +60,7 @@ namespace N1D.App
 		//-----------------------------------
 		public bool IsActive { private set; get; } = false;
 		public float Progress { private set; get; } = 0.0f;
+		public int TargetTime { private set; get; } = 0;
 
 		//-----------------------------------
 		// Define

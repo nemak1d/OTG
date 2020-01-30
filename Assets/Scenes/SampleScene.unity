@@ -150,16 +150,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef514eb6926bbb545b774ac06f35282d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_StartPoint: {x: 0, y: 8, z: 0}
+  m_StartPoint: {x: 0, y: 6, z: 0}
   m_Direction: {x: 0, y: -1, z: 0}
-  m_Length: 16
+  m_Length: 10
   m_TimingLineRate: 0.7
   m_Speed: 1
   m_TimingTime: 5000
   m_LineWidth: 3
   m_Bpm: 60
   m_DestinationTime: 0
-  timing: 401f0000a41f000008200000
+  timing: 401f00005424000068290000
+  m_PerfectDelta: 33
+  m_GreatDelta: 99
+  m_GoodDelta: 264
+  m_IsInput: 0
 --- !u!4 &441014565
 Transform:
   m_ObjectHideFlags: 0
