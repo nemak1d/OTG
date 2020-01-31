@@ -37,18 +37,20 @@ namespace N1D.Framework.Sound
 
 		}
 
-		public void PlayBGM(string bgmClipName)
+		public AudioHandler PlayBGM(string bgmClipName)
 		{
 			var clip = SoundTable.instance.FindBGM(bgmClipName);
 			if (clip == null)
 			{
 				Debug.LogWarningFormat("{0} is not found.", bgmClipName);
-				return;
+				return null;
 			}
 
 			m_Bgm.clip = clip;
 			m_Bgm.loop = true;
 			m_Bgm.Play();
+
+			return new AudioHandler(m_Bgm);
 		}
 		public void StopBGM()
 		{

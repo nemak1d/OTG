@@ -1,5 +1,6 @@
 ﻿using N1D.Framework.Core;
 using N1D.Framework.Dbg;
+using N1D.Framework.Sound;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -30,7 +31,7 @@ namespace N1D.App
 			m_DestinationTime = CalculateDestinationTime(m_TimingTime, m_Speed);
 
 			UpdateInput();
-
+			UpdateMusic();
 			UpdateLine();
 			UpdateTrackSheet();
 
@@ -44,6 +45,16 @@ namespace N1D.App
 				m_IsInput = true;
 			}
 		}
+		private void UpdateMusic()
+		{
+			if (m_StartPlayTime <= Metronome.instance.Time)
+			{
+				if (m_MusicHandle == null)
+				{
+					m_MusicHandle = SoundManager.instance.PlayBGM("popepope");
+				}
+			}
+		}
 
 		private void UpdateTrackSheet()
 		{
@@ -54,7 +65,8 @@ namespace N1D.App
 
 			for (var i = processTimingCount; i < timing.Length; ++i)
 			{
-				var startTime = timing[i] - m_TimingTime;
+				// 表示開始は曲の時間 - 表示してから実際に入力するまでの時間 + 曲再生開始時間
+				var startTime = timing[i] - m_TimingTime + m_StartPlayTime;
 				if (startTime <= Metronome.instance.Time)
 				{
 					foreach (var note in m_Notes)
@@ -241,6 +253,7 @@ namespace N1D.App
 		public float m_TimingLineRate = 0.7f;
 
 		// parameter
+		public int m_StartPlayTime = 3000;
 		public float m_Speed = 1.0f;
 		public int m_TimingTime = 5000;
 
@@ -270,6 +283,8 @@ namespace N1D.App
 		[SerializeField]
 
 		private bool m_IsInput = false;
+
+		private AudioHandler m_MusicHandle = null;
 		
 
 	}

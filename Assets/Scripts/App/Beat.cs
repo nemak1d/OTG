@@ -26,8 +26,6 @@ namespace N1D.App
 				return;
 			}
 
-			//var delta = Metronome.instance.Time - m_StartTime;
-			//Progress = (float)delta % (float)destinationTime / (float)destinationTime;
 			Progress = CalculateProgress(Metronome.instance.Time, destinationTime);
 
 			if (Progress >= 1.0f)
