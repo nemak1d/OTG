@@ -156,15 +156,17 @@ MonoBehaviour:
   m_TimingLineRate: 0.7
   m_StartPlayTime: 5000
   m_Speed: 1
-  m_TimingTime: 2000
+  m_TimingTime: 5000
   m_LineWidth: 3
-  m_Bpm: 155
+  m_Bpm: 60
   m_DestinationTime: 0
   timing: 000000005424000068290000
   m_PerfectDelta: 33
   m_GreatDelta: 99
   m_GoodDelta: 264
-  m_IsInput: 0
+  m_IgnoreJudgeDelta: 500
+  m_RhythmSize: 200
+  m_NoteSize: 100
 --- !u!4 &441014565
 Transform:
   m_ObjectHideFlags: 0

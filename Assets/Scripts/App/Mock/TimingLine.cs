@@ -13,16 +13,8 @@ namespace N1D.App
 			GameEventManager.instance.Add(gameObject);
 			Metronome.instance.Initialize();
 
-			for (var i = 0; i < 100; ++i)
-			{
-				var guide = new Beat();
-				m_Guides.Add(guide);
-			}
-			for (var i = 0; i < 100; ++i)
-			{
-				var note = new Beat();
-				m_Notes.Add(note);
-			}
+			InitializeRhythm();
+			InitializeNote();
 		}
 
 		void Update()
@@ -37,6 +29,22 @@ namespace N1D.App
 			UpdateTrackSheet();
 
 			MightJudge();
+		}
+
+		private void InitializeRhythm()
+		{
+			var eventSettings = new BeatEvent();
+			eventSettings.onUpdate = DrawRhythmLine;
+
+			m_Rhythm.Initialize(m_RhythmSize, eventSettings);
+		}
+
+		private void InitializeNote()
+		{
+			var eventSettings = new BeatEvent();
+			eventSettings.onUpdate = OnUpdateNote;
+
+			m_Note.Initialize(m_NoteSize, eventSettings);
 		}
 
 		private void UpdateInput()
@@ -70,125 +78,68 @@ namespace N1D.App
 				var startTime = timing[i] - m_TimingTime + m_StartPlayTime;
 				if (startTime <= Metronome.instance.Time)
 				{
-					foreach (var note in m_Notes)
-					{
-						if (note.IsActive)
-						{
-							continue;
-						}
-						note.Start(startTime, timing[i]);
-						++processTimingCount;
-						break;
-					}
+					m_Note.Add(startTime, timing[i]);
+					++processTimingCount;
 				}
 			}
-			var endPoint = m_Direction * m_Length + m_StartPoint;
-			var timingPoint = Vector3.Lerp(m_StartPoint, endPoint, m_TimingLineRate);
-			foreach (var note in m_Notes)
-			{
-				if (!note.IsActive)
-				{
-					continue;
-				}
-				note.Update(m_DestinationTime);
-				var point = Vector3.Lerp(m_StartPoint, endPoint, note.Progress);
-				DrawCircle(point, m_LineWidth * 0.3f, Color.red);
 
-				// 前後のラインを測るには内部の式出さないといかんなーとか思っちゃうところ。
-				var earlyPerfect = note.CalculateProgress(Metronome.instance.Time - m_PerfectDelta, m_DestinationTime);
-				var latePerfect = note.CalculateProgress(Metronome.instance.Time + m_PerfectDelta, m_DestinationTime);
-				var earlyGreat = note.CalculateProgress(Metronome.instance.Time - m_GreatDelta, m_DestinationTime);
-				var lateGreat = note.CalculateProgress(Metronome.instance.Time + m_GreatDelta, m_DestinationTime);
-				var earlyGood = note.CalculateProgress(Metronome.instance.Time - m_GoodDelta, m_DestinationTime);
-				var lateGood = note.CalculateProgress(Metronome.instance.Time + m_GoodDelta, m_DestinationTime);
-
-				point = Vector3.Lerp(m_StartPoint, endPoint, earlyPerfect);
-				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.yellow);
-				point = Vector3.Lerp(m_StartPoint, endPoint, latePerfect);
-				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.yellow);
-
-				point = Vector3.Lerp(m_StartPoint, endPoint, earlyGreat);
-				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.cyan);
-				point = Vector3.Lerp(m_StartPoint, endPoint, lateGreat);
-				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.cyan);
-
-				point = Vector3.Lerp(m_StartPoint, endPoint, earlyGood);
-				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.blue);
-				point = Vector3.Lerp(m_StartPoint, endPoint, lateGood);
-				DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.blue);
-			}
+			m_Note.Update(m_DestinationTime);
 		}
 
 		private void UpdateLine()
 		{
+			m_Rhythm.Update(m_DestinationTime);
+
 			var endPoint = m_Direction * m_Length + m_StartPoint;
 			var timingPoint = Vector3.Lerp(m_StartPoint, endPoint, m_TimingLineRate);
 			DrawLine(m_StartPoint, Vector3.right, m_LineWidth, Color.yellow);
 			DrawLine(endPoint, Vector3.right, m_LineWidth, Color.yellow);
 			DrawLine(timingPoint, Vector3.right, m_LineWidth, Color.red);
-
-			var i = 0;
-			foreach (var guide in m_Guides)
-			{
-				++i;
-				if (!guide.IsActive)
-				{
-					continue;
-				}
-				guide.Update(m_DestinationTime);
-				var point = Vector3.Lerp(m_StartPoint, endPoint, guide.Progress);
-				DrawLine(point, Vector3.right, m_LineWidth, Color.green);
-			}
 		}
 
-		private void MightJudge()
+		private void DrawRhythmLine(Beat beat)
 		{
-			if (m_IsInput)
+			if (!beat.IsActive || beat.Progress <= 0.0f || beat.Progress >= 1.0f)
 			{
-				Beat next = null;
-				foreach (var note in m_Notes)
-				{
-					if (!note.IsActive)
-					{
-						continue;
-					}
-
-					if (next == null)
-					{
-						next = note;
-					}
-					// 最遅判定時間をオーバーせず先頭なら
-					else if (note.TargetTime + m_GoodDelta < Metronome.instance.Time
-						&& note.TargetTime < next.TargetTime)
-					{
-						next = note;
-					}
-				}
-
-				if (next != null)
-				{
-					var time = Metronome.instance.Time;
-					if (Mathf.Abs(next.TargetTime - time) <= m_PerfectDelta)
-					{
-						Debug.Log("Perfect!");
-					}
-					else if (Mathf.Abs(next.TargetTime - time) <= m_GreatDelta)
-					{
-						Debug.Log("Great!");
-					}
-					else if (Mathf.Abs(next.TargetTime - time) <= m_GoodDelta)
-					{
-						Debug.Log("Good!");
-					}
-					else
-					{
-						Debug.Log("Miss...");
-					}
-					next.Stop();
-				}
+				return;
 			}
+			var endPoint = m_Direction * m_Length + m_StartPoint;
+			var point = Vector3.Lerp(m_StartPoint, endPoint, beat.Progress);
+			DrawLine(point, Vector3.right, m_LineWidth, Color.green);
+		}
 
-			m_IsInput = false;
+		private void DrawNote(Beat beat)
+		{
+			if (!beat.IsActive || beat.Progress <= 0.0f || beat.Progress >= 1.0f)
+			{
+				return;
+			}
+			var endPoint = m_Direction * m_Length + m_StartPoint;
+			var point = Vector3.Lerp(m_StartPoint, endPoint, beat.Progress);
+			DrawCircle(point, m_LineWidth * 0.3f, (m_JudgeNote == beat) ? Color.red : Color.cyan);
+
+			// 前後のラインを測るには内部の式出さないといかんなーとか思っちゃうところ。
+			var earlyPerfect = beat.CalculateProgress(Metronome.instance.Time - m_PerfectDelta, m_DestinationTime);
+			var latePerfect = beat.CalculateProgress(Metronome.instance.Time + m_PerfectDelta, m_DestinationTime);
+			var earlyGreat = beat.CalculateProgress(Metronome.instance.Time - m_GreatDelta, m_DestinationTime);
+			var lateGreat = beat.CalculateProgress(Metronome.instance.Time + m_GreatDelta, m_DestinationTime);
+			var earlyGood = beat.CalculateProgress(Metronome.instance.Time - m_GoodDelta, m_DestinationTime);
+			var lateGood = beat.CalculateProgress(Metronome.instance.Time + m_GoodDelta, m_DestinationTime);
+
+			point = Vector3.Lerp(m_StartPoint, endPoint, earlyPerfect);
+			DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.yellow);
+			point = Vector3.Lerp(m_StartPoint, endPoint, latePerfect);
+			DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.yellow);
+
+			point = Vector3.Lerp(m_StartPoint, endPoint, earlyGreat);
+			DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.cyan);
+			point = Vector3.Lerp(m_StartPoint, endPoint, lateGreat);
+			DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.cyan);
+
+			point = Vector3.Lerp(m_StartPoint, endPoint, earlyGood);
+			DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.blue);
+			point = Vector3.Lerp(m_StartPoint, endPoint, lateGood);
+			DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.blue);
 		}
 
 		private void DrawLine(Vector3 point, Vector3 direction, float length, Color color)
@@ -208,7 +159,7 @@ namespace N1D.App
 			Debug.Assert(!m_TimingLineRate.IsZero());
 			return (int)(arriveTimeAtTimingLine / m_TimingLineRate);
 		}
-		
+
 		public void OnReceiveGameEvent(GameEventVariant eventVariant)
 		{
 			switch (eventVariant.id)
@@ -223,20 +174,84 @@ namespace N1D.App
 
 		private void OnBeat(GameEventVariant eventVariant)
 		{
-			var isStarted = false;
-			foreach (var guide in m_Guides)
+			var time = Metronome.instance.CalculateBeatTime(eventVariant.intValue);
+			m_Rhythm.Add(Metronome.instance.Time, time);
+		}
+
+		private void OnUpdateNote(Beat beat)
+		{
+			UpdateJudgeNote(beat);
+			DrawNote(beat);
+		}
+
+		private void UpdateJudgeNote(Beat beat)
+		{
+			if (!beat.IsActive || beat.Progress <= 0.0f || beat.Progress >= 1.0f)
 			{
-				if (guide.IsActive)
+				if (m_JudgeNote == beat)
 				{
-					continue;
+					m_JudgeNote = null;
 				}
-				var time = Metronome.instance.CalculateBeatTime(eventVariant.intValue);
-				guide.Start(Metronome.instance.Time, time);
-				isStarted = true;
-				break;
+				return;
 			}
 
-			Debug.Assert(isStarted, "非アクティブなガイドが見つからなかった");
+			if (m_JudgeNote == null)
+			{
+				m_JudgeNote = beat;
+			}
+			else
+			{
+#if false
+				var toJudgeNote = Mathf.Abs(m_JudgeNote.Progress - m_TimingLineRate);
+				var toCurrentNote = Mathf.Abs(beat.Progress - m_TimingLineRate);
+				if (toJudgeNote >= toCurrentNote)
+				{
+					m_JudgeNote = beat;
+				}
+#else
+				// 最遅判定時間をオーバーせず先頭なら
+				if (beat.TargetTime + m_GoodDelta < Metronome.instance.Time
+					&& beat.TargetTime < m_JudgeNote.TargetTime)
+				{
+					m_JudgeNote = beat;
+				}
+#endif
+			}
+		}
+
+
+
+		private void MightJudge()
+		{
+			if (!m_IsInput || m_JudgeNote == null)
+			{
+				return;
+			}
+			var delta = Mathf.Abs(m_JudgeNote.TargetTime - (Metronome.instance.Time - m_StartPlayTime));
+			if (delta > m_IgnoreJudgeDelta)
+			{
+				m_IsInput = false;
+				return;
+			}
+
+			if (delta <= m_PerfectDelta)
+			{
+				Debug.Log("Perfect!");
+			}
+			else if (delta <= m_GreatDelta)
+			{
+				Debug.Log("Great!");
+			}
+			else if (delta <= m_GoodDelta)
+			{
+				Debug.Log("Good!");
+			}
+			else
+			{
+				Debug.Log("Miss...");
+			}
+			m_JudgeNote.Stop();
+			m_IsInput = false;
 		}
 
 		// positions
@@ -262,13 +277,10 @@ namespace N1D.App
 		[SerializeField, Uneditable]
 		private int m_DestinationTime = 0;
 
-		List<Beat> m_Guides = new List<Beat>();
-		List<Beat> m_Notes = new List<Beat>();
 
 		[SerializeField]
 		private int[] timing = null;
 		private int processTimingCount = 0;
-
 
 		[SerializeField]
 		private int m_PerfectDelta = 33;
@@ -277,10 +289,23 @@ namespace N1D.App
 		[SerializeField]
 		private int m_GoodDelta = 264;
 		[SerializeField]
+		private int m_IgnoreJudgeDelta = 500;
 
 		private bool m_IsInput = false;
 
 		private AudioHandler m_MusicHandle = null;
+
+		// well-formed parameters
+		[SerializeField]
+		private int m_RhythmSize = 200;
+		[SerializeField]
+		private int m_NoteSize = 100;
+
+		// well-formed objects
+		private BeatManager m_Rhythm = new BeatManager();
+		private BeatManager m_Note = new BeatManager();
+
+		private Beat m_JudgeNote = null;
 		
 
 	}
