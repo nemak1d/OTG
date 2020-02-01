@@ -28,10 +28,6 @@ namespace N1D.App
 
 			Progress = CalculateProgress(Metronome.instance.Time, destinationTime);
 
-			if (Progress >= 1.0f)
-			{
-				Stop();
-			}
 		}
 		public void Stop()
 		{
@@ -42,11 +38,7 @@ namespace N1D.App
 		public float CalculateProgress(int time, int destinationTime)
 		{
 			var delta = time - m_StartTime;
-			if (delta >= destinationTime)
-			{
-				return 1.0f;
-			}
-			return (float)delta % (float)destinationTime / (float)destinationTime;
+			return (float)delta / (float)destinationTime;
 		}
 
 		//-----------------------------------

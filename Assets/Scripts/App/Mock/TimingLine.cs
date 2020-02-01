@@ -20,7 +20,14 @@ namespace N1D.App
 		void Update()
 		{
 			Metronome.instance.SetBPM(Bpm);
+
+			var currentSpeed = Metronome.instance.Speed;
 			Metronome.instance.SetSpeed(Speed);
+			if (currentSpeed != Metronome.instance.Speed)
+			{
+				OnChangeSpeed();
+			}
+
 			m_DestinationTime = CalculateDestinationTime(m_TimingTime);
 
 			UpdateInput();
@@ -176,6 +183,11 @@ namespace N1D.App
 		{
 			var time = Metronome.instance.CalculateBeatTime(eventVariant.intValue);
 			m_Rhythm.Add(Metronome.instance.Time, time);
+		}
+
+		private void OnChangeSpeed()
+		{
+
 		}
 
 		private void OnUpdateNote(Beat beat)

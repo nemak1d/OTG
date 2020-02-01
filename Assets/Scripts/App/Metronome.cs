@@ -36,7 +36,7 @@ namespace N1D.App
 		{
 			Debug.Assert(Bpm != 0);
 
-			var interval = (Minite * SpeedScale) / (Bpm * Speed);
+			var interval = Minite / Bpm;
 			m_Interval = interval;
 			return interval;
 		}
@@ -88,7 +88,7 @@ namespace N1D.App
 		//-----------------------------------
 		public int Bpm => m_Bpm;
 		public int Speed => m_Speed;
-		public int Time => (TimeManager.instance.GameTimeMs - StartTime) * SpeedScale / Speed;
+		public int Time => (TimeManager.instance.GameTimeMs - StartTime) * Speed / SpeedScale;
 		public int StartTime { private set; get; } = 0;
 		public int Count { private set; get; } = -1;
 
