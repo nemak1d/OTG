@@ -30,7 +30,7 @@ namespace N1D.App
 		public void Initialize()
 		{
 			StartTime = TimeManager.instance.GameTimeMs;
-			Count = 0;
+			Count = -1;
 		}
 		public int CalculateInterval()
 		{
@@ -90,7 +90,7 @@ namespace N1D.App
 		public int Speed => m_Speed;
 		public int Time => (TimeManager.instance.GameTimeMs - StartTime) * SpeedScale / Speed;
 		public int StartTime { private set; get; } = 0;
-		public int Count { private set; get; } = 0;
+		public int Count { private set; get; } = -1;
 
 		//-----------------------------------
 		// Define
