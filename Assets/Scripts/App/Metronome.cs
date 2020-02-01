@@ -16,7 +16,7 @@ namespace N1D.App
         //-----------------------------------
         void Awake()
         {
-			Initialize(m_Bpm);
+			Initialize();
         }
 
         void Update()
@@ -27,21 +27,35 @@ namespace N1D.App
 		//-----------------------------------
 		// Method (public)
 		//-----------------------------------
-		public void Initialize(float bpm)
+		public void Initialize()
 		{
-			Bpm = bpm;
 			StartTime = TimeManager.instance.GameTimeMs;
 			Count = 0;
 		}
 		public int CalculateInterval()
 		{
-			Debug.Assert(!Bpm.IsZero());
+			Debug.Assert(Bpm != 0);
 
-			return (int)(60000.0f / Bpm);
+			var interval = (Minite * SpeedScale) / (Bpm * Speed);
+			m_Interval = interval;
+			return interval;
 		}
 		public int CalculateBeatTime(int count)
 		{
 			return CalculateInterval() * count;
+		}
+
+		public void SetBPM(int bpm)
+		{
+			m_Bpm = bpm;
+		}
+		public void SetSpeed(int speed)
+		{
+			m_Speed = speed;
+		}
+		public void SetSpeed(float speed)
+		{
+			m_Speed = (int)(speed * SpeedScale);
 		}
 
 		//-----------------------------------
@@ -51,7 +65,6 @@ namespace N1D.App
 		private void UpdateInterval()
 		{
 			var interval = CalculateInterval();
-			Time = TimeManager.instance.GameTimeMs - StartTime;
 			var count = Time / interval;
 			if (count > Count)
 			{
@@ -73,24 +86,27 @@ namespace N1D.App
 		//-----------------------------------
 		// Property
 		//-----------------------------------
-		public int Time { private set; get; } = 0;
+		public int Bpm => m_Bpm;
+		public int Speed => m_Speed;
+		public int Time => (TimeManager.instance.GameTimeMs - StartTime) * SpeedScale / Speed;
 		public int StartTime { private set; get; } = 0;
 		public int Count { private set; get; } = 0;
-		public float Bpm
-		{
-			set { m_Bpm = value; }
-			get { return m_Bpm; }
-		}
 
 		//-----------------------------------
 		// Define
 		//-----------------------------------
+		public const int SpeedScale = 100; // = 1.00[x]
+		public const int TimeScale = 1000;
+		public const int Minite = 60 * TimeScale; // = 60.000[s]
 
 		//-----------------------------------
 		// Field
 		//-----------------------------------
-		[SerializeField]
-		private float m_Bpm = 120.0f;
+		[SerializeField, Uneditable]
+		private float m_Interval = 0.0f;
+
+		private int m_Bpm = 60;
+		private int m_Speed = SpeedScale;
 
         //-----------------------------------
         // Internal Class / Struct

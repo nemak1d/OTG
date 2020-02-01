@@ -11,7 +11,7 @@ namespace N1D.App
 		void Start()
 		{
 			GameEventManager.instance.Add(gameObject);
-			Metronome.instance.Initialize(m_Bpm);
+			Metronome.instance.Initialize();
 
 			for (var i = 0; i < 100; ++i)
 			{
@@ -27,8 +27,9 @@ namespace N1D.App
 
 		void Update()
 		{
-			Metronome.instance.Bpm = m_Bpm;
-			m_DestinationTime = CalculateDestinationTime(m_TimingTime, m_Speed);
+			Metronome.instance.SetBPM(Bpm);
+			Metronome.instance.SetSpeed(Speed);
+			m_DestinationTime = CalculateDestinationTime(m_TimingTime);
 
 			UpdateInput();
 			UpdateMusic();
@@ -140,12 +141,6 @@ namespace N1D.App
 			}
 		}
 
-		private float CalculateProgress(int startTime, int currentTime)
-		{
-			var delta = currentTime - startTime; ;
-			return Mathf.Clamp01((float)delta % (float)m_DestinationTime / (float)m_DestinationTime);
-		}
-
 		private void MightJudge()
 		{
 			if (m_IsInput)
@@ -208,12 +203,10 @@ namespace N1D.App
 		{
 			Draw.instance.Circle(point, radius, color);
 		}
-		private int CalculateDestinationTime(int arriveTimeAtTimingLine, float speed)
+		private int CalculateDestinationTime(int arriveTimeAtTimingLine)
 		{
-			Debug.Assert(!speed.IsZero());
-
-			var time = arriveTimeAtTimingLine / (m_Length * m_TimingLineRate);
-			return (int)((float)(time * m_Length) / speed);
+			Debug.Assert(!m_TimingLineRate.IsZero());
+			return (int)(arriveTimeAtTimingLine / m_TimingLineRate);
 		}
 		
 		public void OnReceiveGameEvent(GameEventVariant eventVariant)
@@ -238,7 +231,7 @@ namespace N1D.App
 					continue;
 				}
 				var time = Metronome.instance.CalculateBeatTime(eventVariant.intValue);
-				guide.Start(time, time);
+				guide.Start(Metronome.instance.Time, time);
 				isStarted = true;
 				break;
 			}
@@ -260,8 +253,11 @@ namespace N1D.App
 		// visual
 		public float m_LineWidth = 3.0f;
 
-		[SerializeField, Range(0.001f, 300.0f)]
-		private float m_Bpm = 120.0f;
+		[SerializeField, Range(1, 999)]
+		private int m_Bpm = 120;
+
+		public int Bpm => m_Bpm;
+		public int Speed => (int)(m_Speed * Metronome.SpeedScale);
 
 		[SerializeField, Uneditable]
 		private int m_DestinationTime = 0;
