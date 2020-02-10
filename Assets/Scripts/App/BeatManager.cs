@@ -37,16 +37,16 @@ namespace N1D.App
 			}
 			m_Actives.Clear();
 		}
-		public void Update(int destinationTime)
+		public void Update()
 		{
 			foreach (var obj in m_Actives)
 			{
-				obj.Update(destinationTime);
+				obj.Update();
 				m_EventSettings.onUpdate?.Invoke(obj);
 			}
 		}
 
-		public void Add(int startTime, int targetTime)
+		public void Add(int targetTime)
 		{
 			Beat obj = null;
 			if (m_Pool.IsEmpty)
@@ -65,7 +65,7 @@ namespace N1D.App
 				obj = m_Pool.Pull();
 			}
 
-			obj.Start(startTime, targetTime);
+			obj.Start(targetTime);
 			m_EventSettings.onStart?.Invoke(obj);
 			m_Actives.Enqueue(obj);
 		}

@@ -19,19 +19,21 @@ namespace N1D.App
 
 		void Update()
 		{
-			Metronome.instance.SetBPM(Bpm);
+			Metronome.instance.SetBPM(GameConfig.instance.Bpm);
 
 			var currentSpeed = Metronome.instance.Speed;
-			Metronome.instance.SetSpeed(Speed);
+			Metronome.instance.SetSpeed(GameConfig.instance.Speed);
 			if (currentSpeed != Metronome.instance.Speed)
 			{
 				OnChangeSpeed();
 			}
 
-			m_DestinationTime = CalculateDestinationTime(m_TimingTime);
+			m_DestinationTime = CalculateDestinationTime(GameConfig.instance.TimingTime);
 
 			UpdateInput();
 			UpdateMusic();
+
+			MightCreateBeats();
 			UpdateLine();
 			UpdateTrackSheet();
 
@@ -59,11 +61,12 @@ namespace N1D.App
 			if (Input.anyKeyDown)
 			{
 				m_IsInput = true;
+				Debug.LogWarning("Input:" + Metronome.instance.Time);
 			}
 		}
 		private void UpdateMusic()
 		{
-			if (m_StartPlayTime <= Metronome.instance.Time)
+			if (GameConfig.instance.StartPlayTime <= Metronome.instance.Time)
 			{
 				if (m_MusicHandle == null)
 				{
@@ -82,23 +85,24 @@ namespace N1D.App
 			for (var i = processTimingCount; i < timing.Length; ++i)
 			{
 				// 表示開始は曲の時間 - 表示してから実際に入力するまでの時間 + 曲再生開始時間
-				var startTime = timing[i] - m_TimingTime + m_StartPlayTime;
+				var endTime = CalculateActiveEndTime(timing[i]);
+				var startTime = endTime - CalculateActiveTime();
 				if (startTime <= Metronome.instance.Time)
 				{
-					m_Note.Add(startTime, timing[i]);
+					m_Note.Add(timing[i]);
 					++processTimingCount;
 				}
 			}
 
-			m_Note.Update(m_DestinationTime);
+			m_Note.Update();
 		}
 
 		private void UpdateLine()
 		{
-			m_Rhythm.Update(m_DestinationTime);
+			m_Rhythm.Update();
 
 			var endPoint = m_Direction * m_Length + m_StartPoint;
-			var timingPoint = Vector3.Lerp(m_StartPoint, endPoint, m_TimingLineRate);
+			var timingPoint = Vector3.Lerp(m_StartPoint, endPoint, GameConfig.instance.TimingLineRate);
 			DrawLine(m_StartPoint, Vector3.right, m_LineWidth, Color.yellow);
 			DrawLine(endPoint, Vector3.right, m_LineWidth, Color.yellow);
 			DrawLine(timingPoint, Vector3.right, m_LineWidth, Color.red);
@@ -125,13 +129,12 @@ namespace N1D.App
 			var point = Vector3.Lerp(m_StartPoint, endPoint, beat.Progress);
 			DrawCircle(point, m_LineWidth * 0.3f, (m_JudgeNote == beat) ? Color.red : Color.cyan);
 
-			// 前後のラインを測るには内部の式出さないといかんなーとか思っちゃうところ。
-			var earlyPerfect = beat.CalculateProgress(Metronome.instance.Time - m_PerfectDelta, m_DestinationTime);
-			var latePerfect = beat.CalculateProgress(Metronome.instance.Time + m_PerfectDelta, m_DestinationTime);
-			var earlyGreat = beat.CalculateProgress(Metronome.instance.Time - m_GreatDelta, m_DestinationTime);
-			var lateGreat = beat.CalculateProgress(Metronome.instance.Time + m_GreatDelta, m_DestinationTime);
-			var earlyGood = beat.CalculateProgress(Metronome.instance.Time - m_GoodDelta, m_DestinationTime);
-			var lateGood = beat.CalculateProgress(Metronome.instance.Time + m_GoodDelta, m_DestinationTime);
+			var earlyPerfect = beat.GetProgress(-GameConfig.instance.PerfectDelta);
+			var latePerfect = beat.GetProgress(GameConfig.instance.PerfectDelta);
+			var earlyGreat = beat.GetProgress(-GameConfig.instance.GreatDelta);
+			var lateGreat = beat.GetProgress(GameConfig.instance.GreatDelta);
+			var earlyGood = beat.GetProgress(-GameConfig.instance.GoodDelta);
+			var lateGood = beat.GetProgress(GameConfig.instance.GoodDelta);
 
 			point = Vector3.Lerp(m_StartPoint, endPoint, earlyPerfect);
 			DrawLine(point, Vector3.right, m_LineWidth * 0.3f, Color.yellow);
@@ -163,8 +166,8 @@ namespace N1D.App
 		}
 		private int CalculateDestinationTime(int arriveTimeAtTimingLine)
 		{
-			Debug.Assert(!m_TimingLineRate.IsZero());
-			return (int)(arriveTimeAtTimingLine / m_TimingLineRate);
+			Debug.Assert(!GameConfig.instance.TimingLineRate.IsZero());
+			return (int)((60 * arriveTimeAtTimingLine) / (GameConfig.instance.TimingLineRate * Metronome.instance.Bpm));
 		}
 
 		public void OnReceiveGameEvent(GameEventVariant eventVariant)
@@ -173,16 +176,50 @@ namespace N1D.App
 			{
 				case GameEventId.Beat:
 				{
-					OnBeat(eventVariant);
+					//OnBeat(eventVariant);
 					break;
 				}
 			}
 		}
 
-		private void OnBeat(GameEventVariant eventVariant)
+		public void MightCreateBeats()
 		{
-			var time = Metronome.instance.CalculateBeatTime(eventVariant.intValue);
-			m_Rhythm.Add(Metronome.instance.Time, time);
+			// 生成しようとしたビートの開始時間が現在時刻を下回ってる限り生成し続ける
+			while (true)
+			{
+				var time = Metronome.instance.CalculateBeatTime(m_BeatCount);
+				time = 1000 * m_BeatCount;
+				var endTime = CalculateActiveEndTime(time);
+				var startTime = endTime - CalculateActiveTime();
+				if (startTime <= Metronome.instance.Time)
+				{
+					Debug.LogFormat("start:{0}, end:{1}", startTime, endTime);
+					m_Rhythm.Add(time);
+					++m_BeatCount;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+
+		// ノートの有効時間
+		private int CalculateActiveTime()
+		{
+			return (int)(CalculateScaledTimingTime() / GameConfig.instance.TimingLineRate);
+		}
+		private int CalculateActiveAfterTime()
+		{
+			return (int)(CalculateActiveTime() * (1.0f - GameConfig.instance.TimingLineRate));
+		}
+		private int CalculateActiveEndTime(int targetTime)
+		{
+			return targetTime + CalculateActiveAfterTime();
+		}
+		private int CalculateScaledTimingTime()
+		{
+			return GameConfig.instance.TimingTime * 60 / Metronome.instance.Bpm;
 		}
 
 		private void OnChangeSpeed()
@@ -222,7 +259,7 @@ namespace N1D.App
 				}
 #else
 				// 最遅判定時間をオーバーせず先頭なら
-				if (beat.TargetTime + m_GoodDelta < Metronome.instance.Time
+				if (beat.TargetTime + GameConfig.instance.GoodDelta < Metronome.instance.Time
 					&& beat.TargetTime < m_JudgeNote.TargetTime)
 				{
 					m_JudgeNote = beat;
@@ -239,24 +276,24 @@ namespace N1D.App
 			{
 				return;
 			}
-			var delta = Mathf.Abs(m_JudgeNote.TargetTime - (Metronome.instance.Time - m_StartPlayTime));
-			if (delta > m_IgnoreJudgeDelta)
-			{
-				m_IsInput = false;
-				return;
-			}
+			var delta = Mathf.Abs(m_JudgeNote.TargetTime - Metronome.instance.Time);
 
-			if (delta <= m_PerfectDelta)
+			if (delta <= GameConfig.instance.PerfectDelta)
 			{
 				Debug.Log("Perfect!");
 			}
-			else if (delta <= m_GreatDelta)
+			else if (delta <= GameConfig.instance.GreatDelta)
 			{
 				Debug.Log("Great!");
 			}
-			else if (delta <= m_GoodDelta)
+			else if (delta <= GameConfig.instance.GoodDelta)
 			{
 				Debug.Log("Good!");
+			}
+			else if (delta <= GameConfig.instance.IgnoreJudgeDelta)
+			{
+				m_IsInput = false;
+				return;
 			}
 			else
 			{
@@ -270,21 +307,9 @@ namespace N1D.App
 		public Vector3 m_StartPoint = Vector3.zero;
 		public Vector3 m_Direction = Vector3.down;
 		public float m_Length = 5.0f;
-		public float m_TimingLineRate = 0.7f;
-
-		// parameter
-		public int m_StartPlayTime = 3000;
-		public float m_Speed = 1.0f;
-		public int m_TimingTime = 5000;
 
 		// visual
 		public float m_LineWidth = 3.0f;
-
-		[SerializeField, Range(1, 999)]
-		private int m_Bpm = 120;
-
-		public int Bpm => m_Bpm;
-		public int Speed => (int)(m_Speed * Metronome.SpeedScale);
 
 		[SerializeField, Uneditable]
 		private int m_DestinationTime = 0;
@@ -293,15 +318,6 @@ namespace N1D.App
 		[SerializeField]
 		private int[] timing = null;
 		private int processTimingCount = 0;
-
-		[SerializeField]
-		private int m_PerfectDelta = 33;
-		[SerializeField]
-		private int m_GreatDelta = 99;
-		[SerializeField]
-		private int m_GoodDelta = 264;
-		[SerializeField]
-		private int m_IgnoreJudgeDelta = 500;
 
 		private bool m_IsInput = false;
 
@@ -318,6 +334,7 @@ namespace N1D.App
 		private BeatManager m_Note = new BeatManager();
 
 		private Beat m_JudgeNote = null;
+		private int m_BeatCount = 0;
 		
 
 	}

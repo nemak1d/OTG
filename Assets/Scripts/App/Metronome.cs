@@ -95,6 +95,7 @@ namespace N1D.App
 		//-----------------------------------
 		// Define
 		//-----------------------------------
+		public const int BaseBpm = 60;
 		public const int SpeedScale = 100; // = 1.00[x]
 		public const int TimeScale = 1000;
 		public const int Minite = 60 * TimeScale; // = 60.000[s]

@@ -130,6 +130,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 441014565}
+  - component: {fileID: 441014566}
   - component: {fileID: 441014564}
   m_Layer: 0
   m_Name: Mock
@@ -153,18 +154,9 @@ MonoBehaviour:
   m_StartPoint: {x: 0, y: 6, z: 0}
   m_Direction: {x: 0, y: -1, z: 0}
   m_Length: 10
-  m_TimingLineRate: 0.7
-  m_StartPlayTime: 5000
-  m_Speed: 5
-  m_TimingTime: 5000
   m_LineWidth: 3
-  m_Bpm: 60
   m_DestinationTime: 0
   timing: 000000005424000068290000
-  m_PerfectDelta: 33
-  m_GreatDelta: 99
-  m_GoodDelta: 264
-  m_IgnoreJudgeDelta: 500
   m_RhythmSize: 200
   m_NoteSize: 100
 --- !u!4 &441014565
@@ -181,6 +173,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &441014566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441014563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28a9c04f524a1f24180112f7951575ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Fps: 120
+  m_TimingLineRate: 0.9
+  m_StartPlayTime: 3000
+  m_Speed: 1
+  m_TimingTime: 5000
+  m_Bpm: 10
+  m_PerfectDelta: 33
+  m_GreatDelta: 99
+  m_GoodDelta: 264
+  m_IgnoreJudgeDelta: 500
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

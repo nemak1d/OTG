@@ -12,39 +12,59 @@ namespace N1D.App
 		//-----------------------------------
 		// Method (public)
 		//-----------------------------------
-		public void Start(int startTime, int targetTime)
+		public void Start(int targetTime)
 		{
-			m_StartTime = startTime;
 			TargetTime = targetTime;
 			Progress = 0.0f;
 			IsActive = true;
 		}
-		public void Update(int destinationTime)
+		public void Update()
 		{
 			if (!IsActive)
 			{
 				return;
 			}
 
-			Progress = CalculateProgress(Metronome.instance.Time, destinationTime);
-
+			Progress = GetProgress();
 		}
+
 		public void Stop()
 		{
 			Progress = 1.0f;
 			IsActive = false;
 		}
 
-		public float CalculateProgress(int time, int destinationTime)
+		public float GetProgress(int delta = 0)
 		{
-			var delta = time - m_StartTime;
-			return (float)delta / (float)destinationTime;
+			// TargetTime = タイミング時間の場合
+			var endTime = CalculateActiveEndTime(TargetTime + delta);
+			var startTime = endTime - CalculateActiveTime();
+
+			return (float)(Metronome.instance.Time - startTime) / (float)(endTime - startTime);
 		}
+
+
 
 		//-----------------------------------
 		// Method (private)
 		//-----------------------------------
 
+		private int CalculateActiveTime()
+		{
+			return (int)(CalculateScaledTimingTime() / GameConfig.instance.TimingLineRate);
+		}
+		private int CalculateActiveAfterTime()
+		{
+			return (int)(CalculateActiveTime() * (1.0f - GameConfig.instance.TimingLineRate));
+		}
+		private int CalculateActiveEndTime(int targetTime)
+		{
+			return targetTime + CalculateActiveAfterTime();
+		}
+		private int CalculateScaledTimingTime()
+		{
+			return GameConfig.instance.TimingTime * 60 / Metronome.instance.Bpm;
+		}
 		//-----------------------------------
 		// Property
 		//-----------------------------------
@@ -59,7 +79,6 @@ namespace N1D.App
 		//-----------------------------------
 		// Field
 		//-----------------------------------
-		private int m_StartTime = 0;
 
 		//-----------------------------------
 		// Internal Class / Struct
