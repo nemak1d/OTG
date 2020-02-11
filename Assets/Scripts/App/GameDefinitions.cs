@@ -24,6 +24,9 @@ namespace N1D.App
 		public NoteType type;
 		public int time;
 	}
+	[Serializable]
+	public class NoteSettingArray : Malee.ReorderableArray<NoteSetting> { }
+
 #if UNITY_EDITOR
 	[CustomPropertyDrawer(typeof(NoteSetting))]
 	public class NoteSettingInspector : PropertyDrawer

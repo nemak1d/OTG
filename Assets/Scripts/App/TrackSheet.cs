@@ -30,7 +30,8 @@ namespace N1D.App
 		//-----------------------------------
 		public int Bpm = 120;
 		public int[] TimingTimes = null;
-		public NoteSetting[] Settings = null;
+		[Malee.Reorderable]
+		public NoteSettingArray Settings = null;
         //-----------------------------------
         // Internal Class / Struct
         //-----------------------------------
