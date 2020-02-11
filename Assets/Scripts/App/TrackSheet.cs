@@ -3,8 +3,6 @@
 //  TrackSheet
 //
 //-------------------------------------------
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace N1D.App
@@ -32,7 +30,7 @@ namespace N1D.App
 		//-----------------------------------
 		public int Bpm = 120;
 		public int[] TimingTimes = null;
-
+		public NoteSetting[] Settings = null;
         //-----------------------------------
         // Internal Class / Struct
         //-----------------------------------
