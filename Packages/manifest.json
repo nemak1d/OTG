@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.malee.reorderablelist": "https://github.com/cfoulston/Unity-Reorderable-List.git",
     "com.unity.addressables": "1.1.10",
     "com.unity.collab-proxy": "1.2.16",
     "com.unity.ext.nunit": "1.0.0",
@@ -40,5 +41,11 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
+  },
+  "lock": {
+    "com.malee.reorderablelist": {
+      "revision": "HEAD",
+      "hash": "3bac02ba5dc9ac30fbb17c2b4cf965c415bc1d9f"
+    }
   }
 }
