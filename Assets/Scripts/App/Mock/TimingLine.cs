@@ -1,20 +1,37 @@
 ﻿using N1D.Framework.Core;
 using N1D.Framework.Dbg;
 using N1D.Framework.Sound;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace N1D.App
 {
 	public class TimingLine : MonoBehaviour, IGameEventReceivable
 	{
-		void Start()
+		IEnumerator Start()
 		{
+			this.enabled = false;
+			Addressables.LoadAssetAsync<TrackSheet>("Data/TrackSheet01.asset")
+				.Completed += (h) =>
+				{
+					m_TrackSheet = h.Result;
+				};
+		
+			while (m_TrackSheet == null)
+			{
+				yield return null;
+			}
+
 			GameEventManager.instance.Add(gameObject);
 			Metronome.instance.Initialize();
+			// TODO:トラックデータにBPMも含まれると思うけどどう反映させるか…（調整とか面倒になる的な意味で）
+			//Metronome.instance.SetBPM(m_TrackSheet.Bpm);
 
 			InitializeRhythm();
 			InitializeNote();
+			this.enabled = true;
 		}
 
 		void Update()
@@ -45,7 +62,7 @@ namespace N1D.App
 			var eventSettings = new BeatEvent();
 			eventSettings.onUpdate = DrawRhythmLine;
 
-			m_Rhythm.Initialize(m_RhythmSize, eventSettings);
+			m_Rhythm.Initialize(m_RhythmBufferSize, eventSettings);
 		}
 
 		private void InitializeNote()
@@ -53,7 +70,7 @@ namespace N1D.App
 			var eventSettings = new BeatEvent();
 			eventSettings.onUpdate = OnUpdateNote;
 
-			m_Note.Initialize(m_NoteSize, eventSettings);
+			m_Note.Initialize(m_NoteBufferSize, eventSettings);
 		}
 
 		private void UpdateInput()
@@ -77,19 +94,19 @@ namespace N1D.App
 
 		private void UpdateTrackSheet()
 		{
-			if (timing == null)
+			if (m_TrackSheet == null || m_TrackSheet.TimingTimes.Length <= 0)
 			{
 				return;
 			}
 
-			for (var i = processTimingCount; i < timing.Length; ++i)
+			for (var i = processTimingCount; i < m_TrackSheet.TimingTimes.Length; ++i)
 			{
 				// 表示開始は曲の時間 - 表示してから実際に入力するまでの時間 + 曲再生開始時間
-				var endTime = CalculateActiveEndTime(timing[i]);
+				var endTime = CalculateActiveEndTime(m_TrackSheet.TimingTimes[i]);
 				var startTime = endTime - CalculateActiveTime();
 				if (startTime <= Metronome.instance.Time)
 				{
-					m_Note.Add(timing[i]);
+					m_Note.Add(m_TrackSheet.TimingTimes[i]);
 					++processTimingCount;
 				}
 			}
@@ -325,13 +342,14 @@ namespace N1D.App
 
 		// well-formed parameters
 		[SerializeField]
-		private int m_RhythmSize = 200;
+		private int m_RhythmBufferSize = 200;
 		[SerializeField]
-		private int m_NoteSize = 100;
+		private int m_NoteBufferSize = 100;
 
 		// well-formed objects
 		private BeatManager m_Rhythm = new BeatManager();
 		private BeatManager m_Note = new BeatManager();
+		private TrackSheet m_TrackSheet = null;
 
 		private Beat m_JudgeNote = null;
 		private int m_BeatCount = 0;

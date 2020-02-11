@@ -48,9 +48,9 @@ namespace N1D.App
 		//-----------------------------------
 		// Field
 		//-----------------------------------
-		[SerializeField]
+		[SerializeField, Range(30, 300)]
 		private int m_Fps = 120;
-		[SerializeField, Tooltip("レーン上の入力タイミング位置割合")]
+		[SerializeField, Range(0.01f, 0.99f), Tooltip("レーン上の入力タイミング位置割合")]
 		private float m_TimingLineRate = 0.7f;
 
 		[SerializeField, Tooltip("ゲーム開始から曲再生までの時間")]
