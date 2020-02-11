@@ -33,7 +33,7 @@ namespace N1D.Framework.Social
 			// WebGLの場合は、ゲームプレイ画面と同じウィンドウでツイート画面が開かないよう、処理を変える
 			Application.ExternalEval(string.Format("window.open('{0}','_blank')", builder.ToString()));
 #else
-			  Application.OpenURL(tweetURL);
+			  Application.OpenURL(builder.ToString());
 #endif
 		}
 
