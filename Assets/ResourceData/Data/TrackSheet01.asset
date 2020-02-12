@@ -13,51 +13,11 @@ MonoBehaviour:
   m_Name: TrackSheet01
   m_EditorClassIdentifier: 
   Bpm: 120
-  TimingTimes: b80b0000a00f00008813000070170000581b0000401f00002823000010270000f82a0000e02e0000
   Settings:
-  - type: 1
-    time: 2000
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
-  - type: 0
-    time: 0
+    array:
+    - type: 0
+      time: 3000
+    - type: 0
+      time: 4000
+    - type: 0
+      time: 5000

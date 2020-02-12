@@ -94,19 +94,19 @@ namespace N1D.App
 
 		private void UpdateTrackSheet()
 		{
-			if (m_TrackSheet == null || m_TrackSheet.TimingTimes.Length <= 0)
+			if (m_TrackSheet == null || m_TrackSheet.Settings.Length <= 0)
 			{
 				return;
 			}
 
-			for (var i = processTimingCount; i < m_TrackSheet.TimingTimes.Length; ++i)
+			for (var i = processTimingCount; i < m_TrackSheet.Settings.Length; ++i)
 			{
 				// 表示開始は曲の時間 - 表示してから実際に入力するまでの時間 + 曲再生開始時間
-				var endTime = CalculateActiveEndTime(m_TrackSheet.TimingTimes[i]);
+				var endTime = CalculateActiveEndTime(m_TrackSheet.Settings[i].time);
 				var startTime = endTime - CalculateActiveTime();
 				if (startTime <= Metronome.instance.Time)
 				{
-					m_Note.Add(m_TrackSheet.TimingTimes[i]);
+					m_Note.Add(m_TrackSheet.Settings[i].time);
 					++processTimingCount;
 				}
 			}
