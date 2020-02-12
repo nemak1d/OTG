@@ -44,6 +44,15 @@ namespace N1D.Framework.Core
 			return m_LeftTime <= 0.0f;
 		}
 
+		public float GetRateToZero()
+		{
+			return (m_StartTime <= 0.0f) ? 0.0f : m_LeftTime / m_StartTime;
+		}
+		public float GetRateToOne()
+		{
+			return 1.0f - GetRateToZero();
+		}
+
 		float m_StartTime = 0.0f;
 		float m_LeftTime = 0.0f;
 		bool m_IsTimeOutNow = false;
