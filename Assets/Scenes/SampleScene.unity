@@ -157,8 +157,8 @@ MonoBehaviour:
   m_LineWidth: 3
   m_DestinationTime: 0
   timing: 000000005424000068290000
-  m_RhythmSize: 200
-  m_NoteSize: 100
+  m_RhythmBufferSize: 200
+  m_NoteBufferSize: 100
 --- !u!4 &441014565
 Transform:
   m_ObjectHideFlags: 0
@@ -190,7 +190,7 @@ MonoBehaviour:
   m_StartPlayTime: 3000
   m_Speed: 1
   m_TimingTime: 5000
-  m_Bpm: 10
+  m_Bpm: 120
   m_PerfectDelta: 33
   m_GreatDelta: 99
   m_GoodDelta: 264
