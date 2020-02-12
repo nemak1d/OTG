@@ -29,7 +29,6 @@ namespace N1D.App
 		// Field
 		//-----------------------------------
 		public int Bpm = 120;
-		public int[] TimingTimes = null;
 		[Malee.Reorderable]
 		public NoteSettingArray Settings = null;
         //-----------------------------------

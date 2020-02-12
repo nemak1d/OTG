@@ -52,8 +52,6 @@ namespace N1D.App
 			var capture = Capture(property);
 
 			var rect = position;
-			EditorGUI.LabelField(rect, "note");
-			rect.x = EditorGUIUtility.labelWidth;
 			rect = ToRight(rect, Mathf.Clamp(rect.width * 0.3f, 100.0f, 150.0f));
 			EditorGUI.PropertyField(rect, capture.type, GUIContent.none);
 			rect.x += rect.width;
