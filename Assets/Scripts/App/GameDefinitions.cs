@@ -12,6 +12,13 @@ using UnityEditor;
 
 namespace N1D.App
 {
+	public enum EvaluationGrade : int
+	{
+		Perfect = 0,
+		Great,
+		Good,
+		Miss,
+	}
 	public enum NoteType : int
 	{
 		Default = 0,
