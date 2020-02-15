@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
 using N1D.Framework.Core;
@@ -47,6 +48,7 @@ namespace N1D.App
 			InitializeEvents();
 			InitializeTempoLine();
 			InitializeNote();
+			InitializeTimingLine();
 		}
 
 		public void ManualUpdate()
@@ -54,8 +56,8 @@ namespace N1D.App
 			Metronome.instance.SetBPM(GameConfig.instance.Bpm);
 			Metronome.instance.SetSpeed(GameConfig.instance.Speed);
 
-
 			UpdateMusic();
+			UpdateTimingLine();
 			MightCreateTempoLines();
 			m_TempoLineBeat.Update();
 			MightCreateNotes();
@@ -106,6 +108,21 @@ namespace N1D.App
 			}
 		}
 
+		// timingline
+		private void InitializeTimingLine()
+		{
+			var position = Vector3.Lerp(CalculateStartPoint(), CalculateEndPoint(), GameConfig.instance.TimingLineRate);
+
+			m_TimingLine.transform.localPosition = position;
+		}
+		[Conditional("DEBUG")]
+		private void UpdateTimingLine()
+		{
+			var position = Vector3.Lerp(CalculateStartPoint(), CalculateEndPoint(), GameConfig.instance.TimingLineRate);
+
+			m_TimingLine.transform.localPosition = position;
+		}
+
 		// tempoline
 		private void MightCreateTempoLines()
 		{
@@ -118,7 +135,7 @@ namespace N1D.App
 				var startTime = endTime - CalculateActiveTime();
 				if (startTime <= Metronome.instance.Time)
 				{
-					Debug.LogFormat("start:{0}, end:{1}", startTime, endTime);
+					UnityEngine.Debug.LogFormat("start:{0}, end:{1}", startTime, endTime);
 					m_TempoLineBeat.Add(time);
 					++m_BeatCount;
 				}
@@ -325,6 +342,8 @@ namespace N1D.App
 		private Image m_NotePrefab = null;
 		[SerializeField]
 		private TrackSheet m_Sheet = null;
+		[SerializeField]
+		private Image m_TimingLine = null;
 
 		[SerializeField]
 		private int m_RhythmBufferSize = 200;
