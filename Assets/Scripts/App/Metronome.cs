@@ -47,11 +47,31 @@ namespace N1D.App
 
 		public void SetBPM(int bpm)
 		{
+			var isChange = (m_Bpm != bpm);
 			m_Bpm = bpm;
+
+			if (isChange)
+			{
+				var eventVariant = new GameEventVariant();
+				eventVariant.id = GameEventId.ChangeBpm;
+				eventVariant.intValue = m_Bpm;
+				GameEventManager.instance.Send<IGameEventReceivable>(
+					(target, e) => target.OnReceiveGameEvent(eventVariant));
+			}
 		}
 		public void SetSpeed(int speed)
 		{
+			var isChange = (m_Speed != speed);
 			m_Speed = speed;
+
+			if (isChange)
+			{
+				var eventVariant = new GameEventVariant();
+				eventVariant.id = GameEventId.ChangeSpeed;
+				eventVariant.intValue = m_Speed;
+				GameEventManager.instance.Send<IGameEventReceivable>(
+					(target, e) => target.OnReceiveGameEvent(eventVariant));
+			}
 		}
 		public void SetSpeed(float speed)
 		{

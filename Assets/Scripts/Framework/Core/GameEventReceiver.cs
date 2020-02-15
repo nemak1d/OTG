@@ -25,6 +25,8 @@ namespace N1D.Framework.Core
 		Tweet,
 
 		Beat,
+		ChangeSpeed,
+		ChangeBpm,
 	}
 
 	public struct GameEventVariant

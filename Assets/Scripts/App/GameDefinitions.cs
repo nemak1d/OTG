@@ -19,6 +19,19 @@ namespace N1D.App
 		Good,
 		Miss,
 	}
+	public enum EvaluationTiming : int
+	{
+		Just = 0,
+		Early,
+		Late,
+	}
+
+	public struct Evaluation
+	{
+		public EvaluationGrade grade;
+		public EvaluationTiming timing;
+	}
+
 	public enum NoteType : int
 	{
 		Default = 0,
