@@ -40,6 +40,9 @@ namespace N1D.App
 		public int GreatDelta => m_GreatDelta;
 		public int GoodDelta => m_GoodDelta;
 		public int IgnoreJudgeDelta => m_IgnoreJudgeDelta;
+		public float PerfectScoreScale => m_PerfectScoreScale;
+		public float GreatScoreScale => m_GreatScoreScale;
+		public float GoodScoreScale => m_GoodScoreScale;
 
 		//-----------------------------------
 		// Define
@@ -71,6 +74,17 @@ namespace N1D.App
 		private int m_GoodDelta = 264;
 		[SerializeField]
 		private int m_IgnoreJudgeDelta = 500;
+
+
+		// score
+		// 1,000,000を上限としてnoteCount / 1,000,000で算出する
+		[SerializeField, Range(0.0f, 1.0f)]
+		private float m_PerfectScoreScale = 1.0f;
+		[SerializeField, Range(0.0f, 1.0f)]
+		private float m_GreatScoreScale = 0.8f;
+		[SerializeField, Range(0.0f, 1.0f)]
+		private float m_GoodScoreScale = 0.5f;
+
 
 		//-----------------------------------
 		// Internal Class / Struct

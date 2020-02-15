@@ -49,6 +49,7 @@ namespace N1D.App
 			InitializeTempoLine();
 			InitializeNote();
 			InitializeTimingLine();
+			InitializeScore();
 		}
 
 		public void ManualUpdate()
@@ -109,6 +110,10 @@ namespace N1D.App
 					{
 						++m_Combo;
 					}
+					var add = GetScore(evaluation.grade);
+					UnityEngine.Debug.Log("grade->" + evaluation.grade + " add->" + add);
+					m_CurrentScore = Mathf.Min(m_CurrentScore + add, MaxScore);
+					m_Score.SetScore(m_CurrentScore);
 
 					m_Evaluation.Play(evaluation.grade, m_Combo);
 					m_NoteBeat.Remove(m_JudgeNote);
@@ -349,6 +354,41 @@ namespace N1D.App
 			return m_Direction * m_Length + m_StartPoint;
 		}
 
+		// score
+		private void InitializeScore()
+		{
+			m_ScorePerNote = MaxScore / m_Sheet.Settings.Count;
+
+			// TODO: 雑なのでなんかいい感じに直す
+			if (m_ScorePerNote * m_Sheet.Settings.Count < MaxScore)
+			{
+				++m_ScorePerNote;
+			}
+			
+		}
+		private int GetScore(EvaluationGrade grade)
+		{
+			var scale = 0.0f;
+			switch (grade)
+			{
+				case EvaluationGrade.Perfect:
+					scale = GameConfig.instance.PerfectScoreScale;
+					break;
+
+				case EvaluationGrade.Great:
+					scale = GameConfig.instance.GreatScoreScale;
+					break;
+
+				case EvaluationGrade.Good:
+					scale = GameConfig.instance.GoodScoreScale;
+					break;
+
+				default:
+					break;
+			}
+
+			return (int)(scale * m_ScorePerNote);
+		}
 
 		//-----------------------------------
 		// Property
@@ -362,6 +402,7 @@ namespace N1D.App
 		//-----------------------------------
 		// Field
 		//-----------------------------------
+		const int MaxScore = 1000000;
 		[SerializeField]
 		private bool m_UseLocator = false;
 		[SerializeField]
@@ -419,6 +460,8 @@ namespace N1D.App
 
 		// score
 		private int m_Combo = 0;
+		private int m_ScorePerNote = 0;
+		private int m_CurrentScore = 0;
 
 		//-----------------------------------
 		// Internal Class / Struct
