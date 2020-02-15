@@ -17,6 +17,8 @@ namespace N1D.App
 			TargetTime = targetTime;
 			Progress = 0.0f;
 			IsActive = true;
+
+			OnStart();
 		}
 		public void Update()
 		{
@@ -25,13 +27,19 @@ namespace N1D.App
 				return;
 			}
 
+			OnPreUpdate();
+
 			Progress = GetProgress();
+
+			OnPostUpdate();
 		}
 
 		public void Stop()
 		{
 			Progress = 1.0f;
 			IsActive = false;
+
+			OnStop();
 		}
 
 		public float GetProgress(int delta = 0)
@@ -154,6 +162,12 @@ namespace N1D.App
 
 			Debug.DrawLine(point + Vector3.left * halfWidth, point + Vector3.right * halfWidth, color);
 		}
+
+		// override events
+		protected virtual void OnStart() { }
+		protected virtual void OnStop() { }
+		protected virtual void OnPreUpdate() { }
+		protected virtual void OnPostUpdate() { }
 		//-----------------------------------
 		// Property
 		//-----------------------------------
