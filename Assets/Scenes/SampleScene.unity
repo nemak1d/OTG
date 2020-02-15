@@ -156,7 +156,6 @@ MonoBehaviour:
   m_Length: 10
   m_LineWidth: 3
   m_DestinationTime: 0
-  timing: 000000005424000068290000
   m_RhythmBufferSize: 200
   m_NoteBufferSize: 100
 --- !u!4 &441014565
