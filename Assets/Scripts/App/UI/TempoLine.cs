@@ -10,28 +10,31 @@ namespace N1D.App.UI
 {
     public class TempoLine : MonoBehaviour
     {
-        //-----------------------------------
-        // MonoBehaviour
-        //-----------------------------------
-        void Start()
-        {
-			m_Text = GetComponent<TextMeshProUGUI>();
-        }
-
 		//-----------------------------------
 		// Method (public)
 		//-----------------------------------
 		public void SetTime(int time)
 		{
-			if (m_Text == null)
+			if (Text != null)
 			{
-				m_Text.text = time.ToString();
+				Text.text = time.ToString();
 			}
 		}
 
 		//-----------------------------------
 		// Property
 		//-----------------------------------
+		private TextMeshProUGUI Text
+		{
+			get
+			{
+				if (m_Text == null)
+				{
+					m_Text = GetComponentInChildren<TextMeshProUGUI>(true);
+				}
+				return m_Text;
+			}
+		}
 
 		//-----------------------------------
 		// Define

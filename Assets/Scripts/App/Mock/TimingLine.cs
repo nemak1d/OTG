@@ -332,8 +332,6 @@ namespace N1D.App
 		private int m_DestinationTime = 0;
 
 
-		[SerializeField]
-		private int[] timing = null;
 		private int processTimingCount = 0;
 
 		private bool m_IsInput = false;
