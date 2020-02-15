@@ -16,7 +16,8 @@ namespace N1D.App.UI
         //-----------------------------------
         void Update()
         {
-            if (!m_Timer.IsTimeOut())
+			m_Timer.Update();
+            if (m_Timer.IsTimeOut())
 			{
 				Stop();
 			}

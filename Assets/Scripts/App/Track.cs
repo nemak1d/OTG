@@ -62,6 +62,8 @@ namespace N1D.App
 			m_TempoLineBeat.Update();
 			MightCreateNotes();
 			m_NoteBeat.Update();
+
+			CheckInput();
 		}
 
 		public void OnReceiveGameEvent(GameEventVariant eventVariant)
@@ -91,6 +93,35 @@ namespace N1D.App
 		private void OnChangeBpm(GameEventVariant eventVariant)
 		{
 
+		}
+
+		// input
+		private void CheckInput()
+		{
+			var input = Input.anyKeyDown;//Input.GetKeyDown(KeyCode.Space);
+
+			if (m_JudgeNote != null)
+			{
+				if (input)
+				{
+					var evaluation = m_JudgeNote.Judge(Metronome.instance.Time);
+					if (evaluation.grade != EvaluationGrade.Miss)
+					{
+						++m_Combo;
+					}
+
+					m_Evaluation.Play(evaluation.grade, m_Combo);
+					m_NoteBeat.Remove(m_JudgeNote);
+					m_JudgeNote = null;
+				}
+				else if (m_JudgeNote.TargetTime + GameConfig.instance.GoodDelta < Metronome.instance.Time)
+				{
+					// 見逃し
+					m_Combo = 0;
+					m_NoteBeat.Remove(m_JudgeNote);
+					m_JudgeNote = null;
+				}
+			}
 		}
 
 		// music
@@ -255,6 +286,17 @@ namespace N1D.App
 					view.gameObject.SetActive(false);
 				}
 			}
+
+			// check judge target
+			if (m_JudgeNote == null)
+			{
+				m_JudgeNote = beat;
+			}
+			else if ((beat.TargetTime + GameConfig.instance.GoodDelta < Metronome.instance.Time)
+				&&	(beat.TargetTime < m_JudgeNote.TargetTime))
+			{
+				m_JudgeNote = beat;
+			}
 		}
 		private void OnStopNote(Beat beat)
 		{
@@ -342,8 +384,14 @@ namespace N1D.App
 		private Image m_NotePrefab = null;
 		[SerializeField]
 		private TrackSheet m_Sheet = null;
+
+		// layouts
 		[SerializeField]
 		private Image m_TimingLine = null;
+		[SerializeField]
+		private Score m_Score = null;
+		[SerializeField]
+		private UI.Evaluation m_Evaluation = null;
 
 		[SerializeField]
 		private int m_RhythmBufferSize = 200;
@@ -367,6 +415,10 @@ namespace N1D.App
 		private GameObjectPool<Image> m_NotePool = null;
 		private BeatManager m_NoteBeat = null;
 		private Dictionary<Beat, Image> m_Notes = new Dictionary<Beat, Image>();
+		private Beat m_JudgeNote = null;
+
+		// score
+		private int m_Combo = 0;
 
 		//-----------------------------------
 		// Internal Class / Struct
